@@ -33,6 +33,23 @@ npx playwright install chromium
 node src/run.js https://example.com "what the user should accomplish here" "optional persona"
 ```
 
+## Use it as a service
+
+The engine is also an importable function and an HTTP API, so a host app (e.g. a
+Laravel backend) can drive it without the terminal.
+
+- **Library:** `import { runAudit } from "./src/audit.js"` → `runAudit(url, goal, persona)`
+  resolves to the report JSON (or `{ ok:false, error }` on bad input / bot-block).
+- **JSON CLI:** `node src/run-json.js <url> "<goal>" ["persona"]` — one JSON object on stdout.
+- **HTTP API:** `npm run serve` (PORT env, default 8787)
+  - `GET  /health` → `{ ok, service, version }`
+  - `POST /audit`  body `{ url, goal, persona? }` → `200` report JSON, or `422 { ok:false, error }`
+
+`run-json.js`, `server.js`, and the pretty CLI all call the **same** `runAudit()`
+pipeline in `src/audit.js` — one grounded pipeline, no duplicated analysis. Each
+audit launches headless Chromium (~5–8s, memory-heavy); a production host should
+queue requests and bound concurrency rather than run them all inline.
+
 Runs today with **no API key** — the judgment layer returns nothing rather than
 inventing findings. The LLM call in `src/judge.js` is already wired: it uses the
 OpenAI SDK pointed at **OpenRouter** (`OPENAI_API_KEY` + optional `OPENAI_URL`,

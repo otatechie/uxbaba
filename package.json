@@ -5,7 +5,9 @@
   "type": "module",
   "description": "A UX guide, not an AI scanner. Grounded, layered heuristic evaluation (Nielsen + Krug + Cooper).",
   "scripts": {
-    "eval": "node src/run.js"
+    "eval": "node src/run.js",
+    "eval:json": "node src/run-json.js",
+    "serve": "node src/server.js"
   },
   "dependencies": {
     "dotenv": "^17.4.2",
